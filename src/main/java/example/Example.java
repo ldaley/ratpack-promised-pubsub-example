@@ -18,13 +18,11 @@ public class Example {
     RatpackServer.start(s -> s
         .handlers(c -> c
             .get("pub/:val", ctx -> {
-              System.out.println("pub");
               String val = ctx.getPathTokens().get("val");
               ref.getAndSet(new Promised<>()).success(val);
               ctx.render("published: " + val);
             })
             .get("sub", ctx -> {
-              System.out.println("sub");
               List<Promise<String>> promises = asList(
                   Promise.value("subscribed"),
                   ref.get().promise().map("received "::concat)
