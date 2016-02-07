@@ -2,7 +2,6 @@ package example;
 
 import org.junit.Test;
 import ratpack.test.MainClassApplicationUnderTest;
-import ratpack.test.http.TestHttpClient;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -15,7 +14,8 @@ public class ExampleTest {
 
   @Test
   public void canPubSub() throws Exception {
-    new MainClassApplicationUnderTest(Example.class).test(http -> {
+    MainClassApplicationUnderTest app = new MainClassApplicationUnderTest(Example.class);
+    app.test(http -> {
       // Start the app
       http.getApplicationUnderTest().getAddress();
 
@@ -27,13 +27,13 @@ public class ExampleTest {
         new Thread() {
           @Override
           public void run() {
-            responses.add(TestHttpClient.testHttpClient(http.getApplicationUnderTest()).getText("sub"));
+            responses.add(app.getHttpClient().getText("sub"));
             responded.countDown();
           }
         }.start();
       }
 
-      Thread.sleep(1000); // wait for the subscribers to request
+      Thread.sleep(2000); // wait for the subscribers to request
 
       http.getText("pub/1");
       responded.await(10, TimeUnit.SECONDS);
